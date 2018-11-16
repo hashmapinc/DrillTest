@@ -22,8 +22,12 @@ public class WellController {
 
     private static final Logger LOG = Logger.getLogger(WellController.class.getName());
 
-    @Autowired
     private WellRepository repo;
+
+    @Autowired
+    private void setWellRepo(WellRepository repo){
+        this.repo = repo;
+    }
 
     private ObjectMapper mapper = new ObjectMapper();
 
