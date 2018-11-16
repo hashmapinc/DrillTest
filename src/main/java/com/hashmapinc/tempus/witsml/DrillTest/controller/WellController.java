@@ -100,6 +100,7 @@ public class WellController {
             WellInfo info = new WellInfo();
             WellValue value = new WellValue();
             value.setCompany(w.getCompany());
+            value.setId(w.getUuid());
             value.setName(w.getName());
             value.setTimeZone(w.getTimeZone());
 
