@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,6 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class WellValue {
 
     @JsonProperty("id")
+    @ApiModelProperty(notes = "The UUID for the well")
     private String id;
     @JsonProperty("name")
     private String name;

@@ -1,5 +1,7 @@
 package com.hashmapinc.tempus.witsml.DrillTest.controller;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +13,19 @@ import com.hashmapinc.tempus.witsml.DrillTest.model.well.WellInfo;
 import com.hashmapinc.tempus.witsml.DrillTest.store.Well;
 import com.hashmapinc.tempus.witsml.DrillTest.model.well.WellValue;
 import com.hashmapinc.tempus.witsml.DrillTest.store.WellRepository;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.JAXBIntrospector;
+import javax.xml.bind.Unmarshaller;
 
 @RestController
 public class WellController {
@@ -39,6 +49,15 @@ public class WellController {
      *
      * @return WITSML 2.0 representation of the well
      */
+    @ApiOperation(value = "Gets a well by its UUID", response = WellInfo.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved well"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "There was an internal server error trying to complete your request")
+    }
+    )
     @RequestMapping(value = "/well/v2", method = RequestMethod.GET, produces = "application/json", params = { "uuid" })
     public ResponseEntity<String> getWellByUUID(@RequestParam String uuid)
     {
@@ -84,6 +103,15 @@ public class WellController {
      *
      * @return WITSML 2.0 representation of the well
      */
+    @ApiOperation(value = "Query for wells", response = WellInfo.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved well"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "There was an internal server error trying to complete your request")
+    }
+    )
     @RequestMapping(value = "/well/v2", method = RequestMethod.GET, produces = "application/json")
         public ResponseEntity<String> queryForWells(@RequestParam(required = false) String company,
                                                 @RequestParam(required = false) String name,
@@ -97,61 +125,32 @@ public class WellController {
                 return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
             }
 
-            WellInfo info = new WellInfo();
-            WellValue value = new WellValue();
-            value.setCompany(w.getCompany());
-            value.setId(w.getUuid());
-            value.setName(w.getName());
-            value.setTimeZone(w.getTimeZone());
-
-            if (includeData){
-                value.setData(w.getData());
+            WellInfo info = createSingleWellInfo(w, includeData);
+            try{
+                return new ResponseEntity<>(serializeWell(info), HttpStatus.OK);
             }
-
-            List<WellValue> values = new ArrayList<>();
-            values.add(value);
-            info.setValue(values);
-
-            String jsonResult = "";
-            try {
-                jsonResult = mapper.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(info);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
+            catch (JsonProcessingException ex){
+                return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-            return new ResponseEntity<>(jsonResult, HttpStatus.OK);
         }
 
-        // If Company Was not supplied
+        // If Company Was not supplied and Name was not supplied
         if (company == null){
-            WellInfo info = new WellInfo();
-            List<WellValue> values = new ArrayList<>();
 
-            for (Well w : repo.findAll()) {
-                WellValue value = new WellValue();
-                value.setCompany(w.getCompany());
-                value.setName(w.getName());
-                value.setTimeZone(w.getTimeZone());
-                value.setId(w.getUuid());
+            Iterable<Well> wells = repo.findAll();
 
-                if (includeData){
-                    value.setData(w.getData());
-                }
-                values.add(value);
+            if (wells == null){
+                return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
             }
 
-            info.setValue(values);
+            WellInfo info = createMultiWellInfo(wells, includeData);
 
-            String jsonResult = "";
-            try {
-                jsonResult = mapper.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(info);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
+            try{
+                return new ResponseEntity<>(serializeWell(info), HttpStatus.OK);
             }
-
-            return new ResponseEntity<>(jsonResult, HttpStatus.OK);
+            catch (JsonProcessingException ex){
+                return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
 
         return new ResponseEntity<>("", HttpStatus.OK);
@@ -166,14 +165,27 @@ public class WellController {
      *
      * @return void
      */
-    @RequestMapping(value = "/well/v2", method = RequestMethod.PUT, params = {"uuid","contractId"})
-    public ResponseEntity<Void> upsertWell(@RequestParam String uuid,
-                                           @RequestParam int contractId)
+    @RequestMapping(value = "/well/v2", method = RequestMethod.PUT, params = {"uuid", "contractId"})
+    public ResponseEntity<String> upsertWell(@RequestParam String uuid,
+                                           @RequestParam(required = false) int contractId,
+                                           @RequestBody String payload)
     {
-        //TODO well add to data model
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path(
-                "/{contractId}").build().toUri();//buildAndExpand(contract.getId()).toUri();
-        return ResponseEntity.created(location).build();
+        try {
+            WellInfo info = mapper.readValue(payload, WellInfo.class);
+            Well w = new Well();
+            com.hashmapinc.tempus.WitsmlObjects.v20.Well well = deserialize(info.getValue().get(0).getData());
+            w.setName(well.getCitation().getTitle());
+            w.setData(info.getValue().get(0).getData());
+            w.setUuid(uuid);
+            w.setTimeZone(well.getTimeZone());
+            repo.save(w);
+            return new ResponseEntity<>("", HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (JAXBException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -214,7 +226,7 @@ public class WellController {
      * @param uuid (required) Uuid of the well to be created.
      */
     @RequestMapping(path = "/well/v2", method = RequestMethod.POST, produces = "application/json", params = {"contractId","uuid"})
-    public ResponseEntity<String> createWell(@PathVariable int contractId, @PathVariable String uuid) {
+    public ResponseEntity<String> serializeWell(@PathVariable int contractId, @PathVariable String uuid) {
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
@@ -255,6 +267,76 @@ public class WellController {
     public void setConnectionState(@RequestParam String uuid, @RequestBody String payload)
     {
         LOG.info(payload);
+    }
+
+    /**
+     * Creates a single DrillTest WellInfo object with a single value.
+     *
+     * @param wellEntity The singular well entity returned from the repo
+     * @param includeData Determines whether
+     * @return
+     */
+    private WellInfo createSingleWellInfo(Well wellEntity, boolean includeData){
+        List<Well> values = new ArrayList<>();
+        values.add(wellEntity);
+        return createMultiWellInfo((Iterable<Well>)values, includeData);
+    }
+
+    /**
+     * Creates a single DrillTest WellInfo object with multiple values
+     *
+     * @param wellEntities The well entity objects returned from the repo to include in the WellInfo Object
+     * @param includeData Determines whether to include the XML data in the return value
+     * @return The WellInfo POJO that includes the returned wellEntities
+     */
+    private WellInfo createMultiWellInfo(Iterable<Well> wellEntities, boolean includeData){
+        WellInfo info = new WellInfo();
+        List<WellValue> values = new ArrayList<>();
+
+        for (Well w : wellEntities) {
+            WellValue value = new WellValue();
+            value.setCompany(w.getCompany());
+            value.setName(w.getName());
+            value.setTimeZone(w.getTimeZone());
+            value.setId(w.getUuid());
+
+            if (includeData){
+                value.setData(w.getData());
+            }
+            values.add(value);
+        }
+
+        info.setValue(values);
+
+        return info;
+    }
+
+    /**
+     * Serializes the WellInfo into a DrillTest Well Info Object
+     *
+     * @param wellInfoObj The WellInfo POJO that represents the DrillTest Well Info
+     * @return The JSON-formatted string representation of the WellInfo Object
+     * @throws JsonProcessingException Thrown if the object cannot be serialized
+     */
+    private String serializeWell(WellInfo wellInfoObj) throws JsonProcessingException {
+
+        return mapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(wellInfoObj);
+    }
+
+    /**
+     * Deserializes a WITSML 2.0 object (make sure it has a upper case W for Well (i.e. Well)
+     *
+     * @param witsml The XML string representation of the Well object
+     * @return The deserialized Well POJO
+     *
+     * @throws JAXBException Thrown if there is a parsing error
+     */
+    private static com.hashmapinc.tempus.WitsmlObjects.v20.Well deserialize(String witsml) throws JAXBException {
+        StringReader witsmlReader = new StringReader(witsml);
+        JAXBContext jaxbContext = JAXBContext.newInstance(com.hashmapinc.tempus.WitsmlObjects.v20.Well.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        return (com.hashmapinc.tempus.WitsmlObjects.v20.Well)JAXBIntrospector.getValue(jaxbUnmarshaller.unmarshal(witsmlReader));
     }
 
 }

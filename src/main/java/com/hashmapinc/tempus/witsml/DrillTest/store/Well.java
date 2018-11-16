@@ -11,6 +11,38 @@ public class Well {
     @GeneratedValue
     private Long id;
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public void setStreamingState(String streamingState) {
+        this.streamingState = streamingState;
+    }
+
+    public void setLiveState(String liveState) {
+        this.liveState = liveState;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
     private String uuid;
 
     private String name;

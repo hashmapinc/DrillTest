@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -22,6 +23,7 @@ public class WellInfo {
     @JsonProperty("links")
     private WellLinks links;
     @JsonProperty("value")
+    @ApiModelProperty(notes = "The value for the Well info")
     private List<WellValue> value = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();

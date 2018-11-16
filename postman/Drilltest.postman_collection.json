@@ -1,0 +1,132 @@
+{
+	"info": {
+		"_postman_id": "c994410a-19aa-48ae-8a82-79a8311f650d",
+		"name": "Drilltest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all Wells",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/well/v2?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"well",
+						"v2"
+					],
+					"query": [
+						{
+							"key": "includeData",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "name",
+							"value": "6507/7-A-42",
+							"disabled": true
+						},
+						{
+							"key": "uuid",
+							"value": "c6d249d2-12bc-47a3-91fd-0baa0e792259",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Open Ended DrillTest query for wells"
+			},
+			"response": []
+		},
+		{
+			"name": "Get well by name with data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/well/v2?includeData=true&name=6507/7-A-42",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"well",
+						"v2"
+					],
+					"query": [
+						{
+							"key": "includeData",
+							"value": "true"
+						},
+						{
+							"key": "name",
+							"value": "6507/7-A-42"
+						},
+						{
+							"key": "uuid",
+							"value": "c6d249d2-12bc-47a3-91fd-0baa0e792259",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Get a specific well with a specific name and include the XML data"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Well by UUID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/well/v2?uuid=c6d249d2-12bc-47a3-91fd-0baa0e792259",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"well",
+						"v2"
+					],
+					"query": [
+						{
+							"key": "includeData",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "name",
+							"value": "6507/7-A-42",
+							"disabled": true
+						},
+						{
+							"key": "uuid",
+							"value": "c6d249d2-12bc-47a3-91fd-0baa0e792259"
+						}
+					]
+				},
+				"description": "Get a well by UUID"
+			},
+			"response": []
+		}
+	]
+}
