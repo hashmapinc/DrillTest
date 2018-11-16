@@ -1,5 +1,5 @@
 
-package com.hashmapinc.tempus.witsml.DrillTest.model;
+package com.hashmapinc.tempus.witsml.DrillTest.model.caps;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,27 +11,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource("classpath:caps.properties")
-@ConfigurationProperties(prefix = "dtcap.capability.caps.function.dataobject")
+@ConfigurationProperties(prefix = "dtcap.contact")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "name",
-    "maxDataNodes",
-    "maxDataPoints"
+    "email",
+    "phone"
 })
-public class DataObject {
+public class Contact {
 
     @JsonProperty("name")
     private String name;
-    @JsonProperty("maxDataNodes")
-    private String maxDataNodes;
-    @JsonProperty("maxDataPoints")
-    private String maxDataPoints;
+    @JsonProperty("email")
+    private String email;
+    @JsonProperty("phone")
+    private String phone;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -45,24 +44,24 @@ public class DataObject {
         this.name = name;
     }
 
-    @JsonProperty("maxDataNodes")
-    public String getMaxDataNodes() {
-        return maxDataNodes;
+    @JsonProperty("email")
+    public String getEmail() {
+        return email;
     }
 
-    @JsonProperty("maxDataNodes")
-    public void setMaxDataNodes(String maxDataNodes) {
-        this.maxDataNodes = maxDataNodes;
+    @JsonProperty("email")
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    @JsonProperty("maxDataPoints")
-    public String getMaxDataPoints() {
-        return maxDataPoints;
+    @JsonProperty("phone")
+    public String getPhone() {
+        return phone;
     }
 
-    @JsonProperty("maxDataPoints")
-    public void setMaxDataPoints(String maxDataPoints) {
-        this.maxDataPoints = maxDataPoints;
+    @JsonProperty("phone")
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @JsonAnyGetter
@@ -77,7 +76,7 @@ public class DataObject {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("name", name).append("maxDataNodes", maxDataNodes).append("maxDataPoints", maxDataPoints).append("additionalProperties", additionalProperties).toString();
+        return new ToStringBuilder(this).append("name", name).append("email", email).append("phone", phone).append("additionalProperties", additionalProperties).toString();
     }
 
 }

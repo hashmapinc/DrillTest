@@ -1,5 +1,5 @@
 
-package com.hashmapinc.tempus.witsml.DrillTest.model;
+package com.hashmapinc.tempus.witsml.DrillTest.model.caps;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 

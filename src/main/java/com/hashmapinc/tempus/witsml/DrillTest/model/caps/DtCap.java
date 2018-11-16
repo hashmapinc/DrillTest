@@ -1,5 +1,5 @@
 
-package com.hashmapinc.tempus.witsml.DrillTest.model;
+package com.hashmapinc.tempus.witsml.DrillTest.model.caps;
 
 import java.util.HashMap;
 import java.util.List;

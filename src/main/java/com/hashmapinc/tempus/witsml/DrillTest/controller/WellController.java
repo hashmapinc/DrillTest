@@ -2,8 +2,16 @@ package com.hashmapinc.tempus.witsml.DrillTest.controller;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.tempus.witsml.DrillTest.model.well.WellInfo;
+import com.hashmapinc.tempus.witsml.DrillTest.store.Well;
+import com.hashmapinc.tempus.witsml.DrillTest.model.well.WellValue;
+import com.hashmapinc.tempus.witsml.DrillTest.store.WellRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +22,11 @@ public class WellController {
 
     private static final Logger LOG = Logger.getLogger(WellController.class.getName());
 
+    @Autowired
+    private WellRepository repo;
+
+    private ObjectMapper mapper = new ObjectMapper();
+
     /**
      * Query a well by specified ID. Response returns detail information of the well match the specified ID.
      * UUID of the well.
@@ -22,13 +35,35 @@ public class WellController {
      *
      * @return WITSML 2.0 representation of the well
      */
-    @RequestMapping(value = "/well/v2", method = RequestMethod.GET, produces = "application/json", params = {"uuid"})
-    public ResponseEntity<String> getWellById(@RequestParam String uuid)
+    @RequestMapping(value = "/well/v2", method = RequestMethod.GET, produces = "application/json", params = { "uuid" })
+    public ResponseEntity<String> getWellByUUID(@RequestParam String uuid)
     {
-        LOG.info("In Get Well by UUID");
-        //TODO get well2 from model data by the uuid
-        String well2="";
-        return new ResponseEntity<String>(well2, HttpStatus.OK);
+        LOG.info("In Get well by UUID");
+        Well w = repo.findByUUid(uuid);
+
+        if (w == null){
+            return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+        }
+
+        String wellData = w.getData();
+        WellInfo info = new WellInfo();
+        WellValue value = new WellValue();
+        value.setData(wellData);
+        value.setContentType("application/x-witsml+xml;version=2.0;type=Well");
+        value.setStreamingState(w.getStreamingState());
+        List<WellValue> values = new ArrayList<>();
+        values.add(value);
+        info.setValue(values);
+
+        String jsonResult = "";
+        try {
+            jsonResult = mapper.writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(info);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(jsonResult, HttpStatus.OK);
     }
 
     /**
@@ -45,21 +80,80 @@ public class WellController {
      *
      * @return WITSML 2.0 representation of the well
      */
-    @RequestMapping(value = "/well/v2", method = RequestMethod.GET, produces = "application/json", params = {"company","name","streamingState","liveState","includeData"})
-    public ResponseEntity<ArrayList<String>> queryForWells(@RequestParam String company,
-                                                           @RequestParam String name,
-                                                           @RequestParam String streamingState,
-                                                           @RequestParam String liveState,
-                                                           @RequestParam boolean includeData) {
-        //TODO get wells2 from model data by the company and name
-        ArrayList<String> wells = new ArrayList<>(2);
-        wells.add("");
-        wells.add("");
-        return new ResponseEntity<>(wells, HttpStatus.OK);//HTTP 200 response code
+    @RequestMapping(value = "/well/v2", method = RequestMethod.GET, produces = "application/json")
+        public ResponseEntity<String> queryForWells(@RequestParam(required = false) String company,
+                                                @RequestParam(required = false) String name,
+                                                @RequestParam(required = false) String streamingState,
+                                                @RequestParam(required = false) String liveState,
+                                                @RequestParam(required = false) boolean includeData) {
+        // If Name was Supplied
+        if (name != null){
+            Well w = repo.findByName(name);
+            if (w == null){
+                return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+            }
+
+            WellInfo info = new WellInfo();
+            WellValue value = new WellValue();
+            value.setCompany(w.getCompany());
+            value.setName(w.getName());
+            value.setTimeZone(w.getTimeZone());
+
+            if (includeData){
+                value.setData(w.getData());
+            }
+
+            List<WellValue> values = new ArrayList<>();
+            values.add(value);
+            info.setValue(values);
+
+            String jsonResult = "";
+            try {
+                jsonResult = mapper.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(info);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
+            return new ResponseEntity<>(jsonResult, HttpStatus.OK);
+        }
+
+        // If Company Was not supplied
+        if (company == null){
+            WellInfo info = new WellInfo();
+            List<WellValue> values = new ArrayList<>();
+
+            for (Well w : repo.findAll()) {
+                WellValue value = new WellValue();
+                value.setCompany(w.getCompany());
+                value.setName(w.getName());
+                value.setTimeZone(w.getTimeZone());
+                value.setId(w.getUuid());
+
+                if (includeData){
+                    value.setData(w.getData());
+                }
+                values.add(value);
+            }
+
+            info.setValue(values);
+
+            String jsonResult = "";
+            try {
+                jsonResult = mapper.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(info);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
+            return new ResponseEntity<>(jsonResult, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>("", HttpStatus.OK);
     }
 
     /**
-     * Create or update a well using WITSML object. Well is being created if it doesn't exist, otherwise it gets
+     * Create or update a well using WITSML object. well is being created if it doesn't exist, otherwise it gets
      * updated. Response indicates create or update succeed or not.
      *
      * @param uuid (required) Uuid of the well to be created or updated.
