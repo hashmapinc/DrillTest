@@ -1,22 +1,51 @@
 package com.hashmapinc.tempus.witsml.DrillTest.store;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.NamedQuery;
+import javax.persistence.*;
 
 @Entity
-@NamedQuery(name = "well.findByName", query = "SELECT u FROM Users u WHERE u.name = ?1")
+@NamedQuery(name = "user.findByName", query = "SELECT u FROM User u WHERE u.userName = ?1")
 public class User {
 
     @Id
     @GeneratedValue
     private long Id;
 
+    @Column(name = "name")
     private String userName;
 
     private String password;
 
     private String token;
 
+    public long getId() {
+        return Id;
+    }
+
+    public void setId(long id) {
+        Id = id;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

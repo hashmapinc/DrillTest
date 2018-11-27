@@ -141,3 +141,8 @@ values(10002,'Hashmap','+1:00','Streaming','Connected','e03e86c7-72c1-414e-aecc-
 </Well>
 ');
 
+insert into user (id,name,password,token)
+values (1001,'admin','12345','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
+
+insert into user (id,name,password,token)
+values (1002,'restricted','6789','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ODc2NTQzMjEiLCJuYW1lIjoiUmFuZHkiLCJpYXQiOjE1MTU0NTQyNDU3NDh9.rN5StPSGwvm9wOQMGQTdQohyuz1bZ4TShOA4vKgPjZQ');
