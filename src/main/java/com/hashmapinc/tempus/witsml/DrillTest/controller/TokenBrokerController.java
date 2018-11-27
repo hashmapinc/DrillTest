@@ -5,15 +5,11 @@ import com.hashmapinc.tempus.witsml.DrillTest.model.user.UserInfo;
 import com.hashmapinc.tempus.witsml.DrillTest.model.well.WellInfo;
 import com.hashmapinc.tempus.witsml.DrillTest.store.User;
 import com.hashmapinc.tempus.witsml.DrillTest.store.UserRepository;
-import com.hashmapinc.tempus.witsml.DrillTest.store.WellRepository;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -33,9 +29,13 @@ public class TokenBrokerController {
     }
 
     @ApiOperation(value = "Gets a JWT token for a username and pass", response = WellInfo.class)
-    @RequestMapping(value = "/", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<String> getJwt(@RequestBody String userInfo) {
+    @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<String> getJwt(@RequestBody String userInfo, @RequestHeader("Ocp-Apim-Subscription-Key") String apiKey) {
         LOG.info("In getJwt");
+
+        if (apiKey == null){
+            return new ResponseEntity<>("Authorization has been denied for this request due to invalid or missing API key.", HttpStatus.UNAUTHORIZED);
+        }
 
         UserInfo info;
 
