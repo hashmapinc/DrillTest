@@ -43,10 +43,10 @@ public class WitsmlWellController {
     @ApiOperation(value = "Gets a well by its UID", response = WellInfo.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved well"),
-            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-            @ApiResponse(code = 500, message = "There was an internal server error trying to complete your request")
+            @ApiResponse(code = 401, message = "Unauthorized JWT token."),
+            @ApiResponse(code = 403, message = "No Permission to access the resource."),
+            @ApiResponse(code = 404, message = "The well you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
     @RequestMapping(value = "/witsml/wells/{uid}", method = RequestMethod.GET, produces = "application/json")
@@ -74,5 +74,47 @@ public class WitsmlWellController {
         String wellData = w.getData();
 
         return new ResponseEntity<>(wellData, HttpStatus.OK);
+    }
+
+    /**
+     * Query a well by specified ID. Responds with a 1.4.1.1 formatted string
+     *
+     * @param uid (required) UID of the well.
+     *
+     * @return WITSML 1.4.1.1 representation of the well
+     */
+    @ApiOperation(value = "Gets a well by its UID", response = WellInfo.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved well"),
+            @ApiResponse(code = 401, message = "Unauthorized JWT token."),
+            @ApiResponse(code = 403, message = "No Permission to access the resource."),
+            @ApiResponse(code = 404, message = "The well you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Unexpected error happens on server.")
+    }
+    )
+    @RequestMapping(value = "/witsml/wells/{uid}", method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity<String> putWellByUID(@PathVariable String uid, @RequestHeader("Authorization") String auth,
+                                               @RequestBody String payload)
+    {
+        LOG.info("In Put witsml well by UID");
+
+        if (auth == null){
+            return new ResponseEntity<>("Unauthorized JWT token.", HttpStatus.UNAUTHORIZED);
+        }
+
+        User foundUser = userRepo.findByToken(auth);
+        if (foundUser == null){
+            return new ResponseEntity<>("Unauthorized JWT token.", HttpStatus.UNAUTHORIZED);
+        }
+
+        LOG.info("User " + foundUser.getUserName() + " attempting put to well with uid " + uid);
+
+        WitsmlWell newWell = new WitsmlWell();
+        newWell.setUid(uid);
+        newWell.setData(payload);
+
+        repo.save(newWell);
+
+        return new ResponseEntity<>(payload, HttpStatus.OK);
     }
 }

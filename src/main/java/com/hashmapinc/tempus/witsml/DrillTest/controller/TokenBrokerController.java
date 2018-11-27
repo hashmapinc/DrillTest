@@ -1,5 +1,8 @@
 package com.hashmapinc.tempus.witsml.DrillTest.controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.witsml.DrillTest.model.user.UserInfo;
 import com.hashmapinc.tempus.witsml.DrillTest.model.well.WellInfo;
@@ -12,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.interfaces.RSAPublicKey;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.logging.Logger;
 
 @RestController
@@ -53,6 +59,16 @@ public class TokenBrokerController {
                     "}", HttpStatus.NOT_FOUND);
         }
 
+        String token = GetToken(info.getAccount());
+
+        if (token == null){
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        foundUser.setToken(token);
+
+        repo.save(foundUser);
+
         String response = "{\n" +
                 "  \"jwt\": \"" + foundUser.getToken() + "\"\n" +
                 "}";
@@ -60,4 +76,18 @@ public class TokenBrokerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    private String GetToken(String userName) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256("secret");
+            String token = JWT.create()
+                    .withIssuer("DrillTest")
+                    .withSubject(userName)
+                    .withIssuedAt(new Date())
+                    .withExpiresAt(java.sql.Date.valueOf(LocalDate.now().plusDays(1)))
+                    .sign(algorithm);
+            return token;
+        } catch (JWTCreationException exception) {
+            return null;
+        }
+    }
 }
