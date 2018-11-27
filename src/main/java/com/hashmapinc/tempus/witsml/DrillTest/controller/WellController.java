@@ -113,7 +113,7 @@ public class WellController {
     }
     )
     @RequestMapping(value = "/well/v2", method = RequestMethod.GET, produces = "application/json")
-        public ResponseEntity<String> queryForWells(@RequestParam(required = false) String company,
+    public ResponseEntity<String> queryForWells(@RequestParam(required = false) String company,
                                                 @RequestParam(required = false) String name,
                                                 @RequestParam(required = false) String streamingState,
                                                 @RequestParam(required = false) String liveState,

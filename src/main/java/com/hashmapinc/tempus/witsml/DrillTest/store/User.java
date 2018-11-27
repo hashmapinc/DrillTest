@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @NamedQuery(name = "user.findByName", query = "SELECT u FROM User u WHERE u.userName = ?1")
+@NamedQuery(name = "user.findByToken", query = "SELECT u FROM User u WHERE u.token = ?1")
 public class User {
 
     @Id
