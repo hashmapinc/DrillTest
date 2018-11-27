@@ -23,10 +23,10 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
                 .apis(RequestHandlerSelectors.basePackage("com.hashmapinc.tempus.witsml.DrillTest.controller"))
                 .paths(PathSelectors.any())
                 .build()
-                .apiInfo(metaData());
+                .apiInfo(metadata());
     }
 
-    private ApiInfo metaData() {
+    private ApiInfo metadata() {
         return new ApiInfoBuilder()
                 .title("Drilltest API")
                 .description("\"REST API for testing Drillflow\"")
