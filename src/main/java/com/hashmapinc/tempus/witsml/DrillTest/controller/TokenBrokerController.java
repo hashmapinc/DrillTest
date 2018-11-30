@@ -56,7 +56,13 @@ public class TokenBrokerController {
         if (foundUser == null){
             return new ResponseEntity<>("{\n" +
                     "  \"message\": \"Invalid or missing client credentials.\"\n" +
-                    "}", HttpStatus.NOT_FOUND);
+                    "}", HttpStatus.BAD_REQUEST);
+        }
+
+        if (!foundUser.getPassword().equals(info.getPassword())) {
+            return new ResponseEntity<>("{\n" +
+                    "  \"message\": \"Invalid or missing client credentials.\"\n" +
+                    "}", HttpStatus.BAD_REQUEST);
         }
 
         String token = GetToken(info.getAccount());
