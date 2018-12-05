@@ -2,7 +2,7 @@ package com.hashmapinc.tempus.witsml.DrillTest.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.witsml.DrillTest.store.User;
 import com.hashmapinc.tempus.witsml.DrillTest.store.UserRepository;
 import com.hashmapinc.tempus.witsml.DrillTest.store.WitsmlWell;
