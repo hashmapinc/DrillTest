@@ -59,7 +59,7 @@ You can also submit issues or questions via GitHub Issues [here](https://github.
 
 ## Documentation
 
-Currently only the Well API and wellbore apis are supported
+Currently only the Well API and Wellbore apis are supported
 
 The proposed capabilites endpoint is also supported.
 
