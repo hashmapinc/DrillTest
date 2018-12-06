@@ -61,7 +61,7 @@ You can also submit issues or questions via GitHub Issues [here](https://github.
 
 Currently only the Well API and Wellbore apis are supported
 
-The proposed capabilites endpoint is also supported.
+The proposed capabilities endpoint is also supported.
 
 The Swagger endpoint is at [here](http://localhost:8080/swagger-ui.html)
 
