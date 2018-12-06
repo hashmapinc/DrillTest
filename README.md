@@ -1,6 +1,6 @@
 <img src="https://s3.us-east-2.amazonaws.com/hm-witsml-server/drillFlowLogo.png" alt="DrillFlow"/>
 
-A REST-based implementation for E&P Drilling data access for testing Drillflow
+A REST-based implementation for E&P Drilling data for testing Drillflow
 
 ## Table of Contents
 -   [Features](#features)
