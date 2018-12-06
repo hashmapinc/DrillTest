@@ -47,7 +47,7 @@ public class WitsmlWellboreController {
             @ApiResponse(code = 200, message = "Successfully retrieved well"),
             @ApiResponse(code = 401, message = "Unauthorized JWT token."),
             @ApiResponse(code = 403, message = "No Permission to access the resource."),
-            @ApiResponse(code = 404, message = "The well you were trying to reach is not found"),
+            @ApiResponse(code = 404, message = "The wellbore you were trying to reach is not found"),
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
@@ -73,7 +73,7 @@ public class WitsmlWellboreController {
     }
 
     /**
-     * Query a well by specified ID. Responds with a 1.4.1.1 formatted string
+     * Query a wellbore by specified ID. Responds with a 1.4.1.1 formatted string
      *
      * @param uid (required) UID of the well.
      *
@@ -84,7 +84,7 @@ public class WitsmlWellboreController {
             @ApiResponse(code = 200, message = "Successfully added/updated well"),
             @ApiResponse(code = 401, message = "Unauthorized JWT token."),
             @ApiResponse(code = 403, message = "No Permission to access the resource."),
-            @ApiResponse(code = 404, message = "The well you were trying to reach is not found"),
+            @ApiResponse(code = 404, message = "The wellbore you were trying to reach is not found"),
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
@@ -114,7 +114,7 @@ public class WitsmlWellboreController {
     }
 
     /**
-     * Create a well by specified ID. Responds with a 1.4.1.1 formatted string of the updated well
+     * Create a wellbore by specified ID. Responds with a 1.4.1.1 formatted string of the updated well
      *
      * @return WITSML 1.4.1.1 representation of the updated wellbore
      */
@@ -123,7 +123,7 @@ public class WitsmlWellboreController {
             @ApiResponse(code = 200, message = "Successfully deleted wellbore"),
             @ApiResponse(code = 401, message = "Unauthorized JWT token."),
             @ApiResponse(code = 403, message = "No Permission to access the resource."),
-            @ApiResponse(code = 404, message = "The well you were trying to reach is not found"),
+            @ApiResponse(code = 404, message = "The wellbore you were trying to reach is not found"),
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
@@ -148,16 +148,16 @@ public class WitsmlWellboreController {
     }
 
     /**
-     * Create a well by specified ID. Responds with a 1.4.1.1 formatted string of the updated well
+     * Create a wellbore by specified ID. Responds with a 1.4.1.1 formatted string of the updated well
      *
      * @return WITSML 1.4.1.1 representation of the updated well
      */
-    @ApiOperation(value = "Creates a well by its UID")
+    @ApiOperation(value = "Creates a wellbore by its UID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved well"),
             @ApiResponse(code = 401, message = "Unauthorized JWT token."),
             @ApiResponse(code = 403, message = "No Permission to access the resource."),
-            @ApiResponse(code = 404, message = "The well you were trying to reach is not found"),
+            @ApiResponse(code = 404, message = "The wellbore you were trying to reach is not found"),
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
@@ -177,7 +177,7 @@ public class WitsmlWellboreController {
         if (!authorizeUser(auth))
             return new ResponseEntity<>("Unauthorized JWT token", HttpStatus.UNAUTHORIZED);
 
-        LOG.info("User attempting save to well with uid " + wellbore.getUid());
+        LOG.info("User attempting save to wellbore with uid " + wellbore.getUid());
 
         WitsmlWellbore newWellbore = new WitsmlWellbore();
 
