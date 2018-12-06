@@ -120,7 +120,7 @@ public class WitsmlWellboreController {
      */
     @ApiOperation(value = "Deletes a wellbore by its UID")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully deleted well"),
+            @ApiResponse(code = 200, message = "Successfully deleted wellbore"),
             @ApiResponse(code = 401, message = "Unauthorized JWT token."),
             @ApiResponse(code = 403, message = "No Permission to access the resource."),
             @ApiResponse(code = 404, message = "The well you were trying to reach is not found"),
