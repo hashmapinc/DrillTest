@@ -13,7 +13,7 @@ A REST-based implementation for E&P Drilling data for testing Drillflow function
 
 ## Features
 
--   Exposes data stored in an embedded H2 database for Well, Wellbore, Log and Trajectory
+-   Exposes data stored in an embedded H2 database for Well, Wellbore
 
 ## Requirements
 
