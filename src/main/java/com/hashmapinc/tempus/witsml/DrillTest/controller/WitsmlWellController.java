@@ -187,7 +187,7 @@ public class WitsmlWellController {
 
         // ensure the well doesn't already exist
         if (null != repo.findByUid(well.getUid()))
-            return new ResponseEntity<>("UID:<" + "" + "> already exists", HttpStatus.CONFLICT);
+            return new ResponseEntity<>("UID:<" + well.getUid() + "> already exists", HttpStatus.CONFLICT);
 
         // uid is ok. Save here
         repo.save(newWell);
