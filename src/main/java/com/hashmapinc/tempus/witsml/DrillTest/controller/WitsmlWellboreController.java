@@ -188,6 +188,11 @@ public class WitsmlWellboreController {
         newWellbore.setUid(wellbore.getUid());
         newWellbore.setData(payload);
 
+        // ensure the wellbore doesn't already exist
+        if (null != repo.findByUid(wellbore.getUid()))
+            return new ResponseEntity<>("UID:<" + "" + "> already exists", HttpStatus.CONFLICT);
+        
+        // wellbore uid is valid. Continue with save
         repo.save(newWellbore);
 
         String returnJson;
