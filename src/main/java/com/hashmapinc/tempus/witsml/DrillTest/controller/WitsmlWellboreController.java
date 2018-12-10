@@ -8,12 +8,14 @@ import com.hashmapinc.tempus.witsml.DrillTest.store.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -106,7 +108,13 @@ public class WitsmlWellboreController {
             foundWellbore.setUid(uid);
         }
         else {
-            foundWellbore.setData(payload);
+            JSONObject newWellbore = new JSONObject(payload);
+            ArrayList<JSONObject> wellbores = new ArrayList<>();
+            JSONObject oldWellbore = new JSONObject(foundWellbore.getData());
+            wellbores.add(oldWellbore);
+            wellbores.add(newWellbore);
+            JSONObject mergedWell = Util.merge(wellbores);
+            foundWellbore.setData(mergedWell.toString());
 
         }
         repo.save(foundWellbore);

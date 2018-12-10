@@ -10,12 +10,16 @@ import com.hashmapinc.tempus.witsml.DrillTest.store.WitsmlWellRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -58,7 +62,7 @@ public class WitsmlWellController {
     {
         LOG.info("In Get witsml well by UID");
 
-        if (!authorizeUser(auth))
+        if (authorizeUser(auth))
             return new ResponseEntity<>("Unauthorized JWT token", HttpStatus.UNAUTHORIZED);
 
         LOG.info("User attempting access to well with uid " + uid);
@@ -96,7 +100,7 @@ public class WitsmlWellController {
     {
         LOG.info("In Put witsml well by UID");
 
-        if (!authorizeUser(auth))
+        if (authorizeUser(auth))
             return new ResponseEntity<>("Unauthorized JWT token", HttpStatus.UNAUTHORIZED);
 
         LOG.info("User attempting put to well with uid " + uid);
@@ -108,8 +112,13 @@ public class WitsmlWellController {
             foundWell.setUid(uid);
         }
         else {
-            foundWell.setData(payload);
-
+            JSONObject newWell = new JSONObject(payload);
+            ArrayList<JSONObject> wells = new ArrayList<>();
+            JSONObject oldWell = new JSONObject(foundWell.getData());
+            wells.add(oldWell);
+            wells.add(newWell);
+            JSONObject mergedWell = Util.merge(wells);
+            foundWell.setData(mergedWell.toString());
         }
         repo.save(foundWell);
         return new ResponseEntity<>(payload, HttpStatus.OK);
@@ -134,7 +143,7 @@ public class WitsmlWellController {
     {
         LOG.info("In DELETE witsml well");
 
-        if (!authorizeUser(auth))
+        if (authorizeUser(auth))
             return new ResponseEntity<>("Unauthorized JWT token", HttpStatus.UNAUTHORIZED);
 
         LOG.info("User attempting delete to well with uid " + uid);
@@ -173,7 +182,7 @@ public class WitsmlWellController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        if (!authorizeUser(auth))
+        if (authorizeUser(auth))
             return new ResponseEntity<>("Unauthorized JWT token", HttpStatus.UNAUTHORIZED);
 
         LOG.info("User attempting save to well with uid " + well.getUid());
@@ -203,18 +212,14 @@ public class WitsmlWellController {
     private boolean authorizeUser(String jwt)
     {
         if (jwt == null){
-            return false;
+            return true;
         }
 
         if ("".equals(jwt)){
-            return false;
+            return true;
         }
 
         User foundUser = userRepo.findByToken(jwt);
-        if (foundUser == null){
-            return false;
-        }
-
-        return true;
+        return foundUser == null;
     }
 }
