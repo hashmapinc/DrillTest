@@ -106,6 +106,7 @@ public class WitsmlWellboreController {
         {
             foundWellbore = new WitsmlWellbore();
             foundWellbore.setUid(uid);
+            foundWellbore.setData(payload);
         }
         else {
             JSONObject newWellbore = new JSONObject(payload);
