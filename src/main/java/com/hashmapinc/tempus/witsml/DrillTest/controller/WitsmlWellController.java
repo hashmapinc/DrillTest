@@ -110,6 +110,7 @@ public class WitsmlWellController {
         {
             foundWell = new WitsmlWell();
             foundWell.setUid(uid);
+            foundWell.setData(payload);
         }
         else {
             JSONObject newWell = new JSONObject(payload);
