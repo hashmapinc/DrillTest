@@ -35,7 +35,7 @@ public class TokenBrokerController {
     }
 
     @ApiOperation(value = "Gets a JWT token for a username and pass", response = UserInfo.class)
-    @RequestMapping(value = "/", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/token/jwt/v1/", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<String> getJwt(@RequestBody String userInfo, @RequestHeader("Ocp-Apim-Subscription-Key") String apiKey) {
         LOG.info("In getJwt");
 

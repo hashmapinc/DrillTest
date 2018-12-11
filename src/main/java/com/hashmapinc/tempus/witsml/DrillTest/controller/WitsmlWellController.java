@@ -57,7 +57,7 @@ public class WitsmlWellController {
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
-    @RequestMapping(value = "/witsml/wells/{uid}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/democore/well/v2/witsml/wells/{uid}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<String> getWellByUUID(@PathVariable String uid, @RequestHeader("Authorization") String auth)
     {
         LOG.info("In Get witsml well by UID");
@@ -94,7 +94,7 @@ public class WitsmlWellController {
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
-    @RequestMapping(value = "/witsml/wells/{uid}", method = RequestMethod.PUT, produces = "application/json")
+    @RequestMapping(value = "/democore/well/v2/witsml/wells/{uid}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> putWellByUID(@PathVariable String uid, @RequestHeader("Authorization") String auth,
                                                @RequestBody String payload)
     {
@@ -138,7 +138,7 @@ public class WitsmlWellController {
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
-    @RequestMapping(value = "/witsml/wells/{uid}", method = RequestMethod.DELETE, produces = "application/json")
+    @RequestMapping(value = "/democore/well/v2/witsml/wells/{uid}", method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<String> deleteWellByUid(@PathVariable String uid, @RequestHeader("Authorization") String auth)
     {
         LOG.info("In DELETE witsml well");
@@ -170,7 +170,7 @@ public class WitsmlWellController {
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
-    @RequestMapping(value = "/witsml/wells/", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/democore/well/v2/witsml/wells/", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<String> postWellByUID(@RequestHeader("Authorization") String auth, @RequestBody String payload)
     {
         LOG.info("In POST witsml well");
@@ -218,8 +218,8 @@ public class WitsmlWellController {
         if ("".equals(jwt)){
             return true;
         }
-
-        User foundUser = userRepo.findByToken(jwt);
+        String subJwt = jwt.substring(jwt.indexOf(" ") + 1);
+        User foundUser = userRepo.findByToken(subJwt);
         return foundUser == null;
     }
 }
