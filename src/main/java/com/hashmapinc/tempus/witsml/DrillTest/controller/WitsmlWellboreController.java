@@ -222,7 +222,8 @@ public class WitsmlWellboreController {
             return false;
         }
 
-        User foundUser = userRepo.findByToken(jwt);
+        String subJwt = jwt.substring(jwt.indexOf(" ") + 1);
+        User foundUser = userRepo.findByToken(subJwt);
         if (foundUser == null){
             return false;
         }
