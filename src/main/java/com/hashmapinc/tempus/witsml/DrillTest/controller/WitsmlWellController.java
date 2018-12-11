@@ -113,11 +113,8 @@ public class WitsmlWellController {
         }
         else {
             JSONObject newWell = new JSONObject(payload);
-            ArrayList<JSONObject> wells = new ArrayList<>();
             JSONObject oldWell = new JSONObject(foundWell.getData());
-            wells.add(oldWell);
-            wells.add(newWell);
-            JSONObject mergedWell = Util.merge(wells);
+            JSONObject mergedWell = Util.merge(oldWell,newWell);
             foundWell.setData(mergedWell.toString());
         }
         repo.save(foundWell);

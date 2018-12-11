@@ -109,12 +109,9 @@ public class WitsmlWellboreController {
         }
         else {
             JSONObject newWellbore = new JSONObject(payload);
-            ArrayList<JSONObject> wellbores = new ArrayList<>();
             JSONObject oldWellbore = new JSONObject(foundWellbore.getData());
-            wellbores.add(oldWellbore);
-            wellbores.add(newWellbore);
-            JSONObject mergedWell = Util.merge(wellbores);
-            foundWellbore.setData(mergedWell.toString());
+            JSONObject mergedWellbore = Util.merge(oldWellbore, newWellbore);
+            foundWellbore.setData(mergedWellbore.toString());
 
         }
         repo.save(foundWellbore);
