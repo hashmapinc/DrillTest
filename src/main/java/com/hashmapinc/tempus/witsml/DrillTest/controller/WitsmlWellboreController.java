@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
 import com.hashmapinc.tempus.witsml.DrillTest.store.*;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,10 +42,10 @@ public class WitsmlWellboreController {
      */
     @ApiOperation(value = "Gets a wellbore by its UID")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved well"),
-            @ApiResponse(code = 401, message = "Unauthorized JWT token."),
+            @ApiResponse(code = 200, message = "OK", response = ObjWellbore.class),
+            @ApiResponse(code = 401, message = "Unauthenticated JWT token."),
             @ApiResponse(code = 403, message = "No Permission to access the resource."),
-            @ApiResponse(code = 404, message = "The wellbore you were trying to reach is not found"),
+            @ApiResponse(code = 404, message = "Wellbore not found."),
             @ApiResponse(code = 500, message = "Unexpected error happens on server.")
     }
     )
@@ -59,14 +57,14 @@ public class WitsmlWellboreController {
         LOG.info("In Get witsml wellbore by UID");
 
         if (!authorizeUser(auth))
-            return new ResponseEntity<>("Unauthorized JWT token", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
 
         LOG.info("User attempting access to wellbore with uid " + uid);
 
         WitsmlWellbore w = repo.findByUid(uid, uidWell);
 
         if (w == null){
-            return new ResponseEntity<>("No Wellbore with submitted uid found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
 
         String wellboreData = w.getData();
@@ -83,13 +81,21 @@ public class WitsmlWellboreController {
      */
     @ApiOperation(value = "Upsert a wellbore by its UID")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully added/updated well"),
+            @ApiResponse(code = 200, message = "OK", response = ObjWellbore.class),
+            @ApiResponse(code = 204, message = "NoContent"),
+            @ApiResponse(code = 400, message = "Invalid request content."),
             @ApiResponse(code = 401, message = "Unauthorized JWT token."),
             @ApiResponse(code = 403, message = "No Permission to access the resource."),
-            @ApiResponse(code = 404, message = "The wellbore you were trying to reach is not found"),
-            @ApiResponse(code = 500, message = "Unexpected error happens on server.")
-    }
-    )
+            @ApiResponse(code = 404, message = "Wellbore not found"),
+            @ApiResponse(code = 500, message = "Unexpected error happened on server.")
+    })
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "payload",
+                    dataTypeClass = ObjWellbore.class,
+                    required = true
+            )
+    })
     @RequestMapping(value = "/democore/wellbore/v1/witsml/wellbores/{uid}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> putWellboreByUID(@PathVariable String uid,
                                                    @RequestHeader("Authorization") String auth,
@@ -112,11 +118,14 @@ public class WitsmlWellboreController {
             foundWellbore.setData(payload);
         }
         else {
-            JSONObject newWellbore = new JSONObject(payload);
-            JSONObject oldWellbore = new JSONObject(foundWellbore.getData());
-            JSONObject mergedWellbore = Util.merge(oldWellbore, newWellbore);
-            foundWellbore.setData(mergedWellbore.toString());
-
+            try {
+                JSONObject newWellbore = new JSONObject(payload);
+                JSONObject oldWellbore = new JSONObject(foundWellbore.getData());
+                JSONObject mergedWellbore = Util.merge(oldWellbore, newWellbore);
+                foundWellbore.setData(mergedWellbore.toString());
+            }catch (Exception ex){
+                return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+            }
         }
         repo.save(foundWellbore);
         return new ResponseEntity<>(payload, HttpStatus.OK);
@@ -166,7 +175,7 @@ public class WitsmlWellboreController {
      */
     @ApiOperation(value = "Creates a wellbore by its UID")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved well. Note this method will assign a new UID no matter if one was provided or not"),
+            @ApiResponse(code = 200, response = ObjWellbore.class, message = "OK"),
             @ApiResponse(code = 401, message = "Unauthorized JWT token."),
             @ApiResponse(code = 403, message = "No Permission to access the resource."),
             @ApiResponse(code = 404, message = "The wellbore you were trying to reach is not found"),
