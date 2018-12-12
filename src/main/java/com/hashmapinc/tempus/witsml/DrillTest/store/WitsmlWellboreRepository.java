@@ -4,5 +4,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface WitsmlWellboreRepository extends CrudRepository<WitsmlWellbore, Long> {
 
-    WitsmlWellbore findByUid(String uid);
+    WitsmlWellbore findByUid(String uid, String welluid);
 }

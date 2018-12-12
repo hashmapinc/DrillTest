@@ -156,10 +156,11 @@ public class WitsmlWellController {
 
     /**
      * Create a well by specified ID. Responds with a 1.4.1.1 formatted string of the updated well
+     * Note this method will assign a new UID no matter if one was provided or not
      *
      * @return WITSML 1.4.1.1 representation of the updated well
      */
-    @ApiOperation(value = "Creates a well by its UID")
+    @ApiOperation(value = "Creates a well by its UID. Note this method will assign a new UID no matter if one was provided or not")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved well"),
             @ApiResponse(code = 401, message = "Unauthorized JWT token."),
@@ -186,9 +187,9 @@ public class WitsmlWellController {
         LOG.info("User attempting save to well with uid " + well.getUid());
 
         WitsmlWell newWell = new WitsmlWell();
-        if ("".equals(well.getUid())){
-            well.setUid(UUID.randomUUID().toString());
-        }
+
+        //Create a new UID, because apparently that's what we do now.
+        well.setUid(UUID.randomUUID().toString());
         newWell.setUid(well.getUid());
         newWell.setData(payload);
 
